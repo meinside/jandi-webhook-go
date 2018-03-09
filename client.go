@@ -45,7 +45,7 @@ func NewIncomingClient(webhookURL string) *IncomingClient {
 	}
 }
 
-// ConnectInfoFrom generates a ConnectInfo with given title, description, and image URL
+// ConnectInfoFrom generates an array of one ConnectInfo filled with given title, description, and image URL
 func ConnectInfoFrom(title, description, imageURL string) []ConnectInfo {
 	return []ConnectInfo{
 		ConnectInfo{
@@ -54,6 +54,11 @@ func ConnectInfoFrom(title, description, imageURL string) []ConnectInfo {
 			ImageURL:    imageURL,
 		},
 	}
+}
+
+// ConnectInfoNone returns an empty array of ConnectInfo
+func ConnectInfoNone() []ConnectInfo {
+	return []ConnectInfo{}
 }
 
 // SetVerbose sets if verbose error messages are shown or not
