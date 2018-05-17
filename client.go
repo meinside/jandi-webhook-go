@@ -84,9 +84,11 @@ func (c *IncomingClient) SendIncoming(body, color string, infos []ConnectInfo) (
 
 			var resp *http.Response
 			client := &http.Client{}
-			if resp, err = client.Do(req); err == nil {
+			resp, err = client.Do(req)
+			if resp != nil {
 				defer resp.Body.Close()
-
+			}
+			if err == nil {
 				txt, _ = ioutil.ReadAll(resp.Body)
 
 				if c.verbose {
