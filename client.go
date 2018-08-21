@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
 
 // Incoming is a payload for an incoming webhook
@@ -29,6 +30,8 @@ type ConnectInfo struct {
 const (
 	headerAccept      = "application/vnd.tosslab.jandi-v2+json"
 	headerContentType = "application/json"
+
+	timeoutSeconds = 5
 )
 
 // IncomingClient is a client for sending incoming webhooks
@@ -83,7 +86,9 @@ func (c *IncomingClient) SendIncoming(body, color string, infos []ConnectInfo) (
 			req.Header.Add("Content-Type", headerContentType)
 
 			var resp *http.Response
-			client := &http.Client{}
+			client := &http.Client{
+				Timeout: timeoutSeconds * time.Second,
+			}
 			resp, err = client.Do(req)
 			if resp != nil {
 				defer resp.Body.Close()
