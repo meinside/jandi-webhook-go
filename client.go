@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"time"
 )
@@ -30,8 +31,6 @@ type ConnectInfo struct {
 const (
 	headerAccept      = "application/vnd.tosslab.jandi-v2+json"
 	headerContentType = "application/json"
-
-	timeoutSeconds = 5
 )
 
 // IncomingClient is a client for sending incoming webhooks
@@ -87,7 +86,15 @@ func (c *IncomingClient) SendIncoming(body, color string, infos []ConnectInfo) (
 
 			var resp *http.Response
 			client := &http.Client{
-				Timeout: timeoutSeconds * time.Second,
+				Transport: &http.Transport{
+					Dial: (&net.Dialer{
+						Timeout:   10 * time.Second,
+						KeepAlive: 10 * time.Second,
+					}).Dial,
+					TLSHandshakeTimeout:   5 * time.Second,
+					ResponseHeaderTimeout: 5 * time.Second,
+					ExpectContinueTimeout: 1 * time.Second,
+				},
 			}
 			resp, err = client.Do(req)
 			if resp != nil {
