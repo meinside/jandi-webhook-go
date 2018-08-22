@@ -36,6 +36,7 @@ const (
 // IncomingClient is a client for sending incoming webhooks
 type IncomingClient struct {
 	webhookURL string
+	httpClient *http.Client
 	verbose    bool
 }
 
@@ -43,7 +44,19 @@ type IncomingClient struct {
 func NewIncomingClient(webhookURL string) *IncomingClient {
 	return &IncomingClient{
 		webhookURL: webhookURL,
-		verbose:    false,
+		httpClient: &http.Client{
+			Transport: &http.Transport{
+				Dial: (&net.Dialer{
+					Timeout:   10 * time.Second,
+					KeepAlive: 300 * time.Second,
+				}).Dial,
+				IdleConnTimeout:       90 * time.Second,
+				TLSHandshakeTimeout:   10 * time.Second,
+				ResponseHeaderTimeout: 10 * time.Second,
+				ExpectContinueTimeout: 1 * time.Second,
+			},
+		},
+		verbose: false,
 	}
 }
 
@@ -85,19 +98,8 @@ func (c *IncomingClient) SendIncoming(body, color string, infos []ConnectInfo) (
 			req.Header.Add("Content-Type", headerContentType)
 
 			var resp *http.Response
-			client := &http.Client{
-				Transport: &http.Transport{
-					Dial: (&net.Dialer{
-						Timeout:   10 * time.Second,
-						KeepAlive: 300 * time.Second,
-					}).Dial,
-					IdleConnTimeout:       90 * time.Second,
-					TLSHandshakeTimeout:   10 * time.Second,
-					ResponseHeaderTimeout: 10 * time.Second,
-					ExpectContinueTimeout: 1 * time.Second,
-				},
-			}
-			resp, err = client.Do(req)
+			resp, err = c.httpClient.Do(req)
+
 			if resp != nil {
 				defer resp.Body.Close()
 			}
