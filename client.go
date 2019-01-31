@@ -1,6 +1,8 @@
 package jandi
 
 // Jandi Webhook Library for Golang
+//
+// https://drive.google.com/file/d/0B2qOhquiLKk0TVBqc2JkQmRCMGM/view
 
 import (
 	"bytes"
@@ -15,9 +17,9 @@ import (
 
 // Incoming is a payload for an incoming webhook
 type incoming struct {
-	Body         string        `json:"body"`         // markdown supported
-	ConnectColor string        `json:"connectColor"` // #RRGGBB format
-	ConnectInfo  []ConnectInfo `json:"connectInfo"`
+	Body         string        `json:"body,omitempty"`         // markdown supported
+	ConnectColor string        `json:"connectColor,omitempty"` // #RRGGBB format
+	ConnectInfo  []ConnectInfo `json:"connectInfo,omitempty"`
 }
 
 // ConnectInfo is the information of `Jandi connect`
@@ -60,20 +62,18 @@ func NewIncomingClient(webhookURL string) *IncomingClient {
 	}
 }
 
-// ConnectInfoFrom generates an array of one ConnectInfo filled with given title, description, and image URL
-func ConnectInfoFrom(title, description, imageURL string) []ConnectInfo {
-	return []ConnectInfo{
-		ConnectInfo{
-			Title:       title,
-			Description: description,
-			ImageURL:    imageURL,
-		},
+// ConnectInfoFrom generates a ConnectInfo filled with given title, description, and image URL
+func ConnectInfoFrom(title, description, imageURL string) ConnectInfo {
+	return ConnectInfo{
+		Title:       title,
+		Description: description,
+		ImageURL:    imageURL,
 	}
 }
 
 // ConnectInfoNone returns an empty array of ConnectInfo
-func ConnectInfoNone() []ConnectInfo {
-	return []ConnectInfo{}
+func ConnectInfoNone() ConnectInfo {
+	return ConnectInfo{}
 }
 
 // SetVerbose sets if verbose error messages are shown or not
