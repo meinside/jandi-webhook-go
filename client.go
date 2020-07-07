@@ -17,6 +17,7 @@ import (
 
 // Incoming is a payload for an incoming webhook
 type incoming struct {
+	Title        string        `json:"title,omitempty"`        // (optional) title
 	Body         string        `json:"body,omitempty"`         // markdown supported
 	ConnectColor string        `json:"connectColor,omitempty"` // #RRGGBB format
 	ConnectInfo  []ConnectInfo `json:"connectInfo,omitempty"`
@@ -83,7 +84,15 @@ func (c *IncomingClient) SetVerbose(verbose bool) {
 
 // SendIncoming sends an incoming webhook
 func (c *IncomingClient) SendIncoming(body, color string, infos []ConnectInfo) (result string, err error) {
+	return c.SendIncomingWithTitle("", body, color, infos)
+}
+
+// SendIncomingWithTitle sends an incoming webhook with a title string
+//
+// `title` can be empty
+func (c *IncomingClient) SendIncomingWithTitle(title, body, color string, infos []ConnectInfo) (result string, err error) {
 	payload := incoming{
+		Title:        title,
 		Body:         body,
 		ConnectColor: color,
 		ConnectInfo:  infos,
